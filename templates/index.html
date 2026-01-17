@@ -1,0 +1,82 @@
+<!doctype html>
+<html>
+<head>
+  <meta charset="utf-8" />
+  <title>Flask Demo Form</title>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 24px; background: #f4f6f8; }
+    .card { background: white; padding: 16px; border-radius: 10px; box-shadow: 0 2px 8px rgba(0,0,0,.08); max-width: 760px; }
+    h1 { margin: 0 0 12px 0; color: #1f4e79; }
+    label { display: block; margin-top: 10px; font-weight: bold; }
+    input { width: 100%; padding: 10px; margin-top: 6px; box-sizing: border-box; }
+    button { padding: 10px 14px; border: 0; border-radius: 8px; cursor: pointer; }
+    .btn-save { background: #4caf50; color: white; margin-top: 12px; }
+    .btn-del { background: #e53935; color: white; }
+    .msg { margin: 10px 0; padding: 10px; border-radius: 8px; }
+    .success { background: #e8f5e9; color: #1b5e20; }
+    .error { background: #ffebee; color: #b71c1c; }
+    table { width: 100%; border-collapse: collapse; margin-top: 16px; }
+    th, td { border: 1px solid #ddd; padding: 10px; text-align: left; }
+    th { background: #2f75b5; color: white; }
+    tr:nth-child(even) { background: #f2f2f2; }
+    .row-actions { width: 110px; text-align: center; }
+    .small { color: #555; font-size: 12px; margin-top: 8px; }
+  </style>
+</head>
+<body>
+  <div class="card">
+    <h1>Flask Demo Form</h1>
+
+    {% with messages = get_flashed_messages(with_categories=true) %}
+      {% if messages %}
+        {% for category, message in messages %}
+          <div class="msg {{ category }}">{{ message }}</div>
+        {% endfor %}
+      {% endif %}
+    {% endwith %}
+
+    <form method="post" action="/">
+      <label>Name</label>
+      <input name="name" placeholder="Type your name" />
+
+      <label>Note</label>
+      <input name="note" placeholder="Type a short note" />
+
+      <button class="btn-save" type="submit">Save</button>
+    </form>
+
+    <div class="small">Saved data is stored in a local SQLite file: <b>demo.db</b></div>
+
+    <table>
+      <thead>
+        <tr>
+          <th style="width:60px;">ID</th>
+          <th>Name</th>
+          <th>Note</th>
+          <th style="width:180px;">Created</th>
+          <th class="row-actions">Delete</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% if rows %}
+          {% for r in rows %}
+            <tr>
+              <td>{{ r["id"] }}</td>
+              <td>{{ r["name"] }}</td>
+              <td>{{ r["note"] }}</td>
+              <td>{{ r["created_at"] }}</td>
+              <td class="row-actions">
+                <form method="post" action="/delete/{{ r['id'] }}" style="margin:0;">
+                  <button class="btn-del" type="submit">Delete</button>
+                </form>
+              </td>
+            </tr>
+          {% endfor %}
+        {% else %}
+          <tr><td colspan="5">No entries yet.</td></tr>
+        {% endif %}
+      </tbody>
+    </table>
+  </div>
+</body>
+</html>
