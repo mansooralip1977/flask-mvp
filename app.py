@@ -1,7 +1,7 @@
 import os
 import sqlite3
 from datetime import datetime
-from flask import Flask, render_template, request, redirect, url_for, flash
+from flask import Flask, render_template, request, redirect, url_for, flash, jsonify
 
 app = Flask(__name__)
 app.secret_key = "dev-secret-change-me"  # needed for flash messages
@@ -72,8 +72,25 @@ def delete(row_id: int):
         con.commit()
     flash(f"Deleted row {row_id}.", "success")
     return redirect(url_for("index"))
+    
+@app.route("/api/entries", methods=["GET"])
+def api_entries():
+    init_db()
+    rows = get_rows()
+
+    data = [
+        {
+            "id": row["id"],
+            "name": row["name"],
+            "note": row["note"],
+            "created_at": row["created_at"],
+        }
+        for row in rows
+    ]
+    return jsonify(data)
 
 
 if __name__ == "__main__":
     # Runs on http://127.0.0.1:5000
     app.run(debug=True)
+
